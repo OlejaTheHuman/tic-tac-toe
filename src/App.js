@@ -51,6 +51,9 @@ function App() {
             let actualFigure = figure === 'x' ? 'o' : 'x';
             if(isWin(actualFigure)){
                 console.log(actualFigure, ' is win!')
+            }else if(!boardState.includes('')){
+                alert('So... try one more time');
+                setBoardState(board);
             }
         }
         ,[boardState]);
