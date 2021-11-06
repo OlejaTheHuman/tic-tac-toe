@@ -28,8 +28,6 @@ let draw = [
 ]
 
 
-//var random = items[Math.floor(Math.random()*items.length)]
-
 function randomFigure(){
     return (Math.random() * (101 - 1) + 1).toFixed(0) % 2 === 0 ? aiFigure : huFigure;
 }
