@@ -1,7 +1,8 @@
 body {
+  position: relative;
   margin: 0;
   padding: 0;
-  height: 100vh;
+  min-height: 100vh;
   background-color: #FFFFFF;
   display: flex;
   justify-content: center;
@@ -20,6 +21,68 @@ body {
   flex-wrap: wrap;
 }
 
+.popup{
+  top:0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  position: absolute;
+  backdrop-filter: blur(10px);
+  background-color: rgba(0, 0, 0, 0.65);
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+
+.bender{
+  max-width: 30%;
+}
+
+.popup__content{
+  position: relative;
+  background-color: rgba(0, 0, 0, 0.22);
+  padding: 2%;
+  border-radius: 20px;
+  font-size: 25pt;
+  color: white;
+  font-family: Roboto Mono, serif;
+  font-weight: 600;
+  display: flex;
+  justify-content: center;
+}
+
+.popup__button{
+  position: absolute;
+  cursor: pointer;
+  border: 3px solid white;
+  width: 200px;
+  height: 50px;
+  background-color: #C6F59D;
+  border-radius: 28px;
+  bottom: -28px;
+}
+
+.popup__button{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: black;
+}
+
+.popup__button:hover{
+  background-color: #A4EC65;
+}
+
+.popup__button:active{
+  background-color: #F59D9D;
+}
+
+.queue{
+  font-family: Roboto Mono, monospace;
+  font-size: 15pt;
+}
+
 .cell{
   cursor: pointer;
   box-sizing: border-box;
@@ -31,6 +94,10 @@ body {
   justify-content: center;
   align-items: center;
   font-size: 70pt;
+}
+
+.none{
+  display: none;
 }
 
 .cell:hover{
@@ -49,6 +116,15 @@ body {
   .cell{
     width: 20vw;
     height: 20vw;
+  }
+
+  .popup__content{
+    font-size: 15pt;
+  }
+
+  .popup__button{
+    width: 150px;
+    height: 40px;
   }
 }
 

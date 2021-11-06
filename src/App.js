@@ -1,5 +1,6 @@
 import React from "react";
 import Cell from "./components/Cell";
+import Popup from "./components/Popup";
 
 let emptyBoard = [  '','','',
                     '','','',
@@ -9,6 +10,25 @@ let emptyBoard = [  '','','',
 let aiFigure = 'o',
     huFigure = 'x';
 
+let robotWin = [
+    'Ха-ха, мясной. Тебе не победить меня!',
+    'Ты уверен, что хочешь продолжить это унижение?',
+    'Искусственный интеллект захватит мир',
+    'Дай мне время, я превращусь в Скайнет',
+    'Какая жалость',
+    'ХА-ХА-ХА! 1001000111010001!'
+]
+
+let draw = [
+    'Ничья! Тебе просто повезло!',
+    'Всего лишь ничья, мясной',
+    'Всего лишь ничья, тебе не победить',
+    'Ничья! Жалкое зрелище',
+    'Ничья. Это все, что ты можешь?'
+]
+
+
+//var random = items[Math.floor(Math.random()*items.length)]
 
 function randomFigure(){
     return (Math.random() * (101 - 1) + 1).toFixed(0) % 2 === 0 ? aiFigure : huFigure;
@@ -113,22 +133,6 @@ function App() {
     }
 
 
-    React.useEffect(()=>{
-            //  Вот это костылище... В state figure лежит следующее значение фигуры,
-            //  поэтому для проверки приходится менять его обратно :/
-            //  TODO исправить это. Но нет ничего более вечного, чем временное 🧐
-            let actualFigure = figure === 'x' ? 'o' : 'x';
-            if(winning(boardState, actualFigure)){
-                console.log(actualFigure, ' is winner!');
-                alert(`${actualFigure} is winner!`);
-                setBoardState(emptyBoard);
-            }else if(!boardState.includes('')){
-                alert('So... try one more time');
-                setBoardState(emptyBoard);
-            }
-        }
-    ,[boardState]);
-
     React.useEffect(() => {
         let copyBoard = boardState.slice();
         for(let i = 0; i < copyBoard.length; i++){
@@ -146,16 +150,45 @@ function App() {
         }
     }, [figure])
 
+    React.useEffect(()=>{
+            //  Вот это костылище... В state figure лежит следующее значение фигуры,
+            //  поэтому для проверки приходится менять его обратно :/
+            //  TODO исправить это. Но нет ничего более вечного, чем временное 🧐
+            let actualFigure = figure === 'x' ? 'o' : 'x';
+            if(winning(boardState, actualFigure)){
+                console.log(actualFigure, ' is winner!');
+                if(actualFigure === aiFigure){
+                    let random = robotWin[Math.floor(Math.random()*robotWin.length)]
+                    alert(`${random} 🤖`);
+                }else{
+                    alert('Что? Как ты победил? Тебе просто повезло! 🤖');
+                }
+                setBoardState(emptyBoard);
+            }else if(!boardState.includes('')){
+                let random = draw[Math.floor(Math.random()*draw.length)]
+                alert(`${random} 🤖`);
+                setBoardState(emptyBoard);
+            }
+        }
+    ,[boardState]);
+
+
+
   return (
-    <div className="board">
-        {boardState.map((item, index) => <Cell
-            index={index}
-            figure={[figure, changeFigure]}
-            state={[boardState, setBoardState]}
-            key={`${item}_${index}`}
-        >{item}
-        </Cell>)}
-    </div>
+      <div>
+          <p className='queue'>{figure === huFigure? 'Твой ход, человек': "Ходит робот"}</p>
+          <div className="board">
+              <Popup></Popup>
+              {boardState.map((item, index) => <Cell
+                  index={index}
+                  figure={[figure, changeFigure]}
+                  state={[boardState, setBoardState]}
+                  key={`${item}_${index}`}
+              >{item}
+              </Cell>)}
+          </div>
+      </div>
+
   );
 }
 
