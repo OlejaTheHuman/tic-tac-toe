@@ -1,32 +1,9 @@
 import React from "react";
 import Cell from "./components/Cell";
 
-
-let emptyBoard = [  'o','','x',
-                    'o','','o',
-                    '','x','o',
-                 ];
-
-
-
-/*let emptyBoard = [  '','','',
+let emptyBoard = [  '','','',
                     '','','',
                     '','','',
-];*/
-
-
-let goodResult = {};
-
-
-let winCombinations = [
-    '111000000',
-    '000111000',
-    '000000111',
-    '100010001',
-    '001010100',
-    '010010010',
-    '100100100',
-    '001001001'
 ];
 
 let aiFigure = 'o',
@@ -40,36 +17,21 @@ function randomFigure(){
 
 function App() {
     const [boardState, setBoardState] = React.useState(emptyBoard);
-    const [figure, setFigure] = React.useState('x');
-    const [flag, setFlag] = React.useState(figure === aiFigure)
+    const [figure, setFigure] = React.useState(randomFigure);
 
-    function onClickFlag(state){
-        setFlag(!state);
+    function changeFigure(figure){
+        setFigure(figure === 'x' ? 'o' : 'x');
+        return figure
     }
 
-    /*function emptyIndices(board){
-        let boardCopy = board.slice();
-        let result = [];
-        while (boardCopy.includes('')){
-            result.push(boardCopy.indexOf(''));
-            boardCopy[boardCopy.indexOf('')] = '-';
-        }
-        return result;
-    }
-*/
     function emptyIndices(board) {
         return board.filter(s => s !== "x" && s !== "o");
     }
 
-    function minMax(boardState, figure) {
-        let board = boardState.slice();
+    function minMax(board, figure) {
 
-        let emptyCells = emptyIndices(boardState); // Получаем массив клеток, в которые можно сходить
-        for(let i = 0; i < board.length; i++){
-            if(board[i] === ''){
-                board[i] = i;
-            }
-        }
+        let emptyCells = emptyIndices(board); // Получаем массив клеток, в которые можно сходить
+
 
         if(winning(board, huFigure)){
             return {score: -10};
@@ -95,8 +57,10 @@ function App() {
             }
             board[emptyCells[i]] = move.index;
             moves.push(move);
-
         }
+
+        let everyMoves = moves.slice();
+
         let bestMove;
         if(figure === aiFigure){
             let bestScore = -10000;
@@ -106,23 +70,28 @@ function App() {
                     bestMove = i;
                 }
             }
-        }else{
+        }else {
             // иначе пройти циклом по ходам и выбрать ход с наименьшим количеством очков
             let bestScore = 10000;
-            for(let i = 0; i < moves.length; i++){
-                if(moves[i].score < bestScore){
+            for (let i = 0; i < moves.length; i++) {
+                if (moves[i].score < bestScore) {
                     bestScore = moves[i].score;
                     bestMove = i;
                 }
             }
         }
-        // вернуть выбранный ход (объект) из массива ходов
-        if (moves[bestMove].index !== undefined){
-            goodResult = moves[bestMove]
-            return moves[bestMove];
-        }else {
-            return goodResult;
+
+        // Если Алгоритм ходит первым, то ставим нолик в центр
+        let iter = 0;
+        everyMoves.map((obj) => {
+            if (obj.score === 0){
+                iter++
+            }})
+        if(iter === 9){
+            return {index: 4, score: 10};
         }
+
+       return moves[bestMove];
     }
 
 
@@ -143,52 +112,13 @@ function App() {
         }
     }
 
-    function isWin (board, figure){
-        let combination;
-        for(let i = 0; i < winCombinations.length; i++){
-            combination = winCombinations[i].split('');
-            let index;
-            let result = [];
-            for(let j = 0; j < 3; j++){
-              index = combination.indexOf('1');
-              if(boardState[index] === figure){
-                  result.push(true);
-              }else if(boardState[index] !== figure){
-                  result.push(false);
-              }
-              combination[index] = 0;
-            }
-            if(!result.includes(false)) {
-              return true;
-            }
-        }
-    }
-
-
-    React.useEffect(()=>{
-        let copyBoard = boardState.slice()
-        if(figure === huFigure) {
-            setFlag(true);
-        }
-        if(flag){
-            //console.log('copyBoard', copyBoard);
-            let result = minMax(copyBoard, figure);
-            //console.log('result', result);
-            copyBoard[result.index] = aiFigure;
-            //console.log('copyBoard 2', copyBoard);
-            setBoardState(copyBoard);
-            //console.log('boardState', boardState);
-            setFigure(figure === 'x' ? 'o' : 'x');
-            onClickFlag(flag);
-        }
-    }, [boardState]);
 
     React.useEffect(()=>{
             //  Вот это костылище... В state figure лежит следующее значение фигуры,
             //  поэтому для проверки приходится менять его обратно :/
             //  TODO исправить это. Но нет ничего более вечного, чем временное 🧐
             let actualFigure = figure === 'x' ? 'o' : 'x';
-            if(isWin(boardState, actualFigure)){
+            if(winning(boardState, actualFigure)){
                 console.log(actualFigure, ' is winner!');
                 alert(`${actualFigure} is winner!`);
                 setBoardState(emptyBoard);
@@ -197,12 +127,24 @@ function App() {
                 setBoardState(emptyBoard);
             }
         }
-        ,[boardState]);
+    ,[boardState]);
 
-    function changeFigure(figure){
-       setFigure(figure === 'x' ? 'o' : 'x');
-       return figure
-    }
+    React.useEffect(() => {
+        let copyBoard = boardState.slice();
+        for(let i = 0; i < copyBoard.length; i++){
+            if(copyBoard[i] === ''){
+                copyBoard[i] = i;
+            }
+        }
+        let result = minMax(copyBoard, aiFigure).index;
+        if(figure === aiFigure){
+            let temp = boardState.slice();
+            console.log('result', result)
+            temp[result] = aiFigure;
+            setBoardState(temp);
+            changeFigure(figure)
+        }
+    }, [figure])
 
   return (
     <div className="board">
